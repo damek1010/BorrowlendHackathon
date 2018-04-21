@@ -59,4 +59,23 @@ class UserController
         echo json_encode($result);
         return $response;
     }
+
+    public function signin(Request $request, $response){
+        $args = $request->getParams();
+        $conn = $this->container['db'];
+
+        $stmt = $conn->prepare("SELECT login, password FROM Users WHERE login=:login AND password=:pass");
+        $result = $stmt->execute ([
+           'login' => $args['login'],
+           'pass' => $args['password']
+        ]);
+
+        if(isset($result['login']) == false)
+        $result = [
+            'err' => 'User non exist'
+        ];
+
+        echo json_encode($result);
+        return $response;
+    }
 }
