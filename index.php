@@ -17,6 +17,7 @@ $container['db'] = function ($c) {
 };
 $app->group('/user', function (){
     $this->get('/home', \UserController::class . ':home');
+    $this->post('/basic', \UserController::class . ':basic');
     $this->post('/register', \UserController::class . ':register');
 });
 $app->run();

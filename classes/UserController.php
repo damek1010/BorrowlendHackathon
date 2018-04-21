@@ -1,6 +1,7 @@
 <?php
 
 use Psr\Container\ContainerInterface;
+use Slim\Http\Request;
 
 /**
  * Created by PhpStorm.
@@ -25,7 +26,7 @@ class UserController
         return $response;
     }
 
-    public function register(\Slim\Http\Request $request, $response)
+    public function register(Request $request, $response)
     {
         /**
          * @var $conn PDO
@@ -42,6 +43,19 @@ class UserController
         $result = [
             'err' => !$result
         ];
+        echo json_encode($result);
+        return $response;
+    }
+
+    public function basic(Request $request, $response) {
+        $args = $request->getParams();
+        $bills = new BillsController($this->container);
+
+        $result = [
+            'debt' => $bills->getDebtByUser($args['user_id']),
+            'deficit' => $bills->getDeficitByUser($args['user_id'])
+        ];
+
         echo json_encode($result);
         return $response;
     }
