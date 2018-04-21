@@ -11,10 +11,5 @@ $container['db'] = function ($c) {
     return $conn;
 };
 $app = new \Slim\App(['settings' => $config]);
-$app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
-    $name = $args['name'];
-    $response->getBody()->write("Hello, $name");
-
-    return $response;
-});
+$app->get('/hello/{name}', \UserController::class . ':home');
 $app->run();
