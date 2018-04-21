@@ -1,6 +1,7 @@
 <?php
 
 use Psr\Container\ContainerInterface;
+use Slim\Http\Request;
 
 /**
  * Created by PhpStorm.
@@ -42,4 +43,26 @@ class BillsController {
         return $stmt->fetchColumn(0);
     }
 
+    public function show(Request $request, $response) {
+        $conn = $this->container['db'];
+        /**
+         * @var $stmt PDOStatement
+         */
+        $args = $request->getParams();
+        $stmt = $conn->prepare("SELECT id, title, owned FROM Bills WHERE Bills.id=:bill_id");
+        $stmt->execute([
+            ':bill_id' => $args['bill_id']
+        ]);
+        $bill = $stmt->fetch();
+        $stmt = $conn->prepare("SELECT login FROM User_Bills INNER JOIN Users ON Users.id = User_Bills.user WHERE User_Bills.bill=:bill_id");
+        $stmt->execute([
+            ':bill_id' => $args['bill_id']
+        ]);
+        $users = $stmt->fetchAll();
+        $result = [
+            'bill' => $bill,
+            'users' => $users
+        ];
+        return json_encode($result);
+    }
 }

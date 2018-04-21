@@ -43,8 +43,7 @@ class UserController
         $result = [
             'err' => !$result
         ];
-        echo json_encode($result);
-        return $response;
+        return json_encode($result);
     }
 
     public function basic(Request $request, $response) {
@@ -56,32 +55,42 @@ class UserController
             'deficit' => $bills->getDeficitByUser($args['user_id'])
         ];
 
-        echo json_encode($result);
-        return $response;
+        return json_encode($result);
     }
 
     public function signin(Request $request, $response){
         $args = $request->getParams();
         $conn = $this->container['db'];
 
-        $stmt = $conn->prepare("SELECT login, password FROM Users WHERE login=:login AND password=:pass");
-        $result = $stmt->execute ([
-           'login' => $args['login'],
-           'pass' => $args['password']
+        /**
+         * @var $stmt PDOStatement
+         */
+        $stmt = $conn->prepare("SELECT id, login, password FROM Users WHERE login=:login AND password=:pass");
+        $stmt->execute ([
+           ':login' => $args['login'],
+           ':pass' => md5($args['password'])
         ]);
-        $result->fetch();
 
-        if(isset($result['login']) == false) {
-            $result = [
-                'err' => 'User non exist'
-            ];
-        }
-        else {
-            $result = [ 'login' => $result['login']];
-        }
+        if($stmt->rowCount() <= 0) return json_encode(['err' => 1]);
 
+        $result = $stmt->fetch();
 
-        echo json_encode($result);
-        return $response;
+        return json_encode([
+            'id' => $result['id'],
+            'login' => $result['login']
+        ]);
+    }
+
+    public function bills(Request $request, $response) {
+        $conn = $this->container['db'];
+        /**
+         * @var $stmt PDOStatement
+         */
+        $args = $request->getParams();
+        $stmt = $conn->prepare("SELECT id, title FROM Bills WHERE Bills.owned=:user_id");
+        $stmt->execute([
+            ':user_id' => $args['user_id']
+        ]);
+        return json_encode($stmt->fetchAll());
     }
 }

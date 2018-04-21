@@ -3,6 +3,8 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
 require 'vendor/autoload.php';
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
 
 $config = require ('config.php');
 $app = new \Slim\App(['settings' => $config]);
@@ -20,5 +22,10 @@ $app->group('/user', function (){
     $this->post('/basic', \UserController::class . ':basic');
     $this->post('/register', \UserController::class . ':register');
     $this->post('/signin', \UserController::class . ':signin');
+    $this->post('/bills', \UserController::class . ':bills');
+});
+
+$app->group('/bills', function (){
+    $this->post('/', BillsController::class . ':show');
 });
 $app->run();
