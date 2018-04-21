@@ -69,11 +69,17 @@ class UserController
            'login' => $args['login'],
            'pass' => $args['password']
         ]);
+        $result->fetch();
 
-        if(isset($result['login']) == false)
-        $result = [
-            'err' => 'User non exist'
-        ];
+        if(isset($result['login']) == false) {
+            $result = [
+                'err' => 'User non exist'
+            ];
+        }
+        else {
+            $result = [ 'login' => $result['login']];
+        }
+
 
         echo json_encode($result);
         return $response;
